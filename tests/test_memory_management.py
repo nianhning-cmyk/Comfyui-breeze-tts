@@ -58,6 +58,28 @@ class MemoryManagementTests(unittest.TestCase):
         self.assertEqual(cast.call_args.kwargs["dtype"], embedding.weight.dtype)
         uncast.assert_called_once()
 
+    @unittest.skipUnless(
+        hasattr(native, "_comfy_cast_bias_weight"),
+        "ComfyUI ops unavailable",
+    )
+    def test_cast_bias_weight_sets_combined_linear_for_plain_modules(self):
+        module = torch.nn.Linear(2, 2)
+        self.assertFalse(hasattr(module, "_combined_linear"))
+        cast = mock.Mock(return_value=(None, None, None))
+        with mock.patch.object(native, "_comfy_cast_bias_weight", cast):
+            result = native._cast_bias_weight(module)
+        self.assertEqual(result, (None, None, None))
+        self.assertIsNone(module._combined_linear)
+        cast.assert_called_once()
+
+        sentinel = object()
+        module._combined_linear = sentinel
+        with mock.patch.object(
+            native, "_comfy_cast_bias_weight", mock.Mock(return_value=(None, None, None))
+        ):
+            native._cast_bias_weight(module)
+        self.assertIs(module._combined_linear, sentinel)
+
     @unittest.skipUnless(torch.cuda.is_available(), "CUDA required")
     def test_scaled_embedding_with_cpu_weights_and_cuda_tokens(self):
         embedding = self.embedding()

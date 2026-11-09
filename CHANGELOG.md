@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fix ComfyUI 0.44+ `cast_modules_with_vbar` compatibility: set `_combined_linear = None` on plain `nn.Module` weight-cast shims before delegating to `comfy.ops.cast_bias_weight`. Covers `_ComfyLinear`, `_ComfyEmbedding`, `_ComfyT5Gemma2Embedding`, the RMSNorm patches and the depth codebook head, without patching ComfyUI core.
+
 ## 0.3.7 — 2026-09-18
 
 - Fix Issue #2: make T5Gemma2's scaled text embedding and the depth codebook head participate in ComfyUI weight casting, preserving embedding scaling and EOI substitution when weights are offloaded to CPU.

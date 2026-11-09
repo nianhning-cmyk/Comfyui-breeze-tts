@@ -141,8 +141,21 @@ def register_te_flash_attention() -> None:
 try:
     import comfy.ops as _comfy_ops
 
-    _cast_bias_weight = _comfy_ops.cast_bias_weight
+    _comfy_cast_bias_weight = _comfy_ops.cast_bias_weight
     _uncast_bias_weight = _comfy_ops.uncast_bias_weight
+
+    def _cast_bias_weight(module, x=None, **kwargs):
+        """Adapt plain nn.Module shims to ComfyUI >=0.44 weight casting.
+
+        ``comfy.ops.cast_modules_with_vbar`` reads ``module._combined_linear``.
+        The castable shims in this file (and the RMSNorm patches below) are
+        ordinary ``nn.Module`` subclasses and do not define it, so ComfyUI
+        raises ``AttributeError``. ``None`` is the correct "not a combined
+        linear layer" value; set it before delegating.
+        """
+        if not hasattr(module, "_combined_linear"):
+            module._combined_linear = None
+        return _comfy_cast_bias_weight(module, x, **kwargs)
 except Exception:
 
     def _cast_bias_weight(module, x=None, *, dtype=None, device=None, **kwargs):
