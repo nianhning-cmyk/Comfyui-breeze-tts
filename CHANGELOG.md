@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fix ComfyUI 0.44+ `cast_modules_with_vbar` compatibility: set `_combined_linear = None` on plain `nn.Module` weight-cast shims before delegating to `comfy.ops.cast_bias_weight`. Covers `_ComfyLinear`, `_ComfyEmbedding`, `_ComfyT5Gemma2Embedding`, the RMSNorm patches and the depth codebook head, without patching ComfyUI core.
+- Fix ComfyUI 0.44+ `cast_modules_with_vbar` compatibility: set `_combined_linear = None` on the castable shims and on any plain `nn.Module` passed through `_cast_bias_weight`, before delegating to `comfy.ops.cast_bias_weight`. Covers `_ComfyLinear`, `_ComfyEmbedding`, `_ComfyT5Gemma2Embedding`, the RMSNorm patches and the depth codebook head, without patching ComfyUI core.
 
 ## 0.3.7 — 2026-09-18
 

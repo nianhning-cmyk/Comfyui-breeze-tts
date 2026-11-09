@@ -63,6 +63,9 @@ class MemoryManagementTests(unittest.TestCase):
         "ComfyUI ops unavailable",
     )
     def test_cast_bias_weight_sets_combined_linear_for_plain_modules(self):
+        self.assertIsNone(native._ComfyLinear._combined_linear)
+        self.assertIsNone(native._ComfyEmbedding._combined_linear)
+        self.assertIsNone(native._ComfyT5Gemma2Embedding._combined_linear)
         module = torch.nn.Linear(2, 2)
         self.assertFalse(hasattr(module, "_combined_linear"))
         cast = mock.Mock(return_value=(None, None, None))
